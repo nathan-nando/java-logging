@@ -4,9 +4,11 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
+//TODO:CREATE NON BLOCKING SYSTEM.IN while Reading File Stream
 public class Main {
 
     public static void main(String[] args) {
+
         Config config = new Config();
         config.loadJsonFile();
         LogApp logApp = new LogApp();
