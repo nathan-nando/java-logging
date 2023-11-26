@@ -18,8 +18,8 @@ import java.util.logging.Logger;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ConfigFile {
-    private static final Logger LOGGER = Logger.getLogger(ConfigFile.class.getName());
+public class Config {
+    private static final Logger LOGGER = Logger.getLogger(Config.class.getName());
     protected final String configFile = "./config.json";
 
     private String activeID;

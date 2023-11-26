@@ -1,12 +1,12 @@
-import configs.ConfigFile;
+import configs.Config;
 
 public class Main {
 
     public static void main(String[] args) {
-        ConfigFile configFile = new ConfigFile();
-        configFile.loadJsonFile();
+        Config config = new Config();
+        config.loadJsonFile();
 
-        LogApp logApp = new LogApp(configFile.getActiveFile());
+        LogApp logApp = new LogApp(config.getActiveFile());
         logApp.readLogFile();
 
     }
