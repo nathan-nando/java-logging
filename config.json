@@ -1,0 +1,26 @@
+{
+  "data": [
+    {
+      "file": "C:\\ProgramData\\IBM\\MQSI\\components\\LOCAL_HOST\\servers\\LOCAL_SERVER\\console.txt",
+      "name": "local_host",
+      "id": "idx1"
+    },
+    {
+      "file": "C:\\Users\\lumba\\OneDrive\\Documents\\ILCS\\console1.txt",
+      "name": "Try1",
+      "id": "idx2"
+    },
+    {
+      "file": "C:\\Users\\lumba\\OneDrive\\Documents\\ILCS\\console2.txt",
+      "name": "Try2",
+      "id": "idx3"
+    },
+    {
+      "file": "TEST.txt",
+      "name": "TEST",
+      "id": "0b3457ab-18a4-4548-9e2a-6748851d2461"
+    }
+  ],
+  "size": 4,
+  "active": "idx1"
+}
