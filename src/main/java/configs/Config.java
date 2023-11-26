@@ -44,6 +44,14 @@ public class Config {
         return -1;
     }
 
+    public void renderLogs(){
+        for (int i = 0; i < this.size; i++) {
+            System.out.println(i
+                    + ". "
+                    + "[" +data.get(i).getName() + "] - file path: "
+                    + data.get(i).getFile());
+        }
+    }
     public void add(String name, String file) {
         if(this.findByName(name) == -1){
             DataConfig payload = new DataConfig(name, file);
@@ -103,7 +111,7 @@ public class Config {
 
     public void loadJsonFile() {
         try {
-            LOGGER.info("Loading config file...");
+            LOGGER.info("Loading config.json...");
             File file = new File(this.configFile);
             String jsonString = "";
             jsonString = new String(Files.readAllBytes(Paths.get(file.toURI())));
@@ -119,9 +127,9 @@ public class Config {
                         objArr.getJSONObject(i).get("file").toString());
                 data.add(dataConfig);
             }
-            LOGGER.info("SUCCEED load file, total file: " + this.size);
+            LOGGER.info("SUCCEED load config.json, total log: " + this.size);
         } catch (IOException e) {
-            LOGGER.info("FAILED load file");
+            LOGGER.info("FAILED load config.json");
             throw new RuntimeException(e);
         }
     }

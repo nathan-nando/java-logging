@@ -5,13 +5,9 @@
       "name": "server ibm"
     },
     {
-      "file": "C:\\Users\\lumba\\OneDrive\\Documents\\ILCS\\console1.txt",
-      "name": "test1"
-    },
-    {
-      "file": "fakepath",
-      "name": "test2"
+      "file": "C:\\Users\\lumba\\OneDrive\\Documents\\ILCS\\console.txt",
+      "name": "test"
     }
   ],
-  "size": 3
+  "size": 2
 }
