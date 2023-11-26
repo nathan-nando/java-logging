@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 @Getter
@@ -22,96 +21,68 @@ public class Config {
     private static final Logger LOGGER = Logger.getLogger(Config.class.getName());
     protected final String configFile = "./config.json";
 
-    private String activeID;
-    private String activeFile;
     private int size;
     private List<DataConfig> data = new ArrayList<DataConfig>();
+
+    private DataConfig selectedConfig = null;
 
     @Setter
     @Getter
     @AllArgsConstructor
     public static class DataConfig {
-        private String id;
         private String name;
         private String file;
     }
-
-    public void add(String name, String file) {
-        String id = UUID.randomUUID().toString();
-        DataConfig payload = new DataConfig(id, name, file);
-        JSONObject obj = new JSONObject();
-
-        this.data.add(payload);
-
-        obj.put("active", this.activeID);
-        obj.put("data", data);
-        obj.put("size", size + 1);
-
-        this.writeJsonFile(obj);
-        LOGGER.info("SUCCEED ADD LOG FILE with ID - [" + id + "]");
-        this.loadJsonFile();
+    private int findByName(String name){
+        for (int i = 0; i < this.size; i++) {
+            if(data.get(i).getName().equals(name)){
+                LOGGER.info("File with name - [" + name + "] found");
+                return i;
+            }
+        }
+        LOGGER.info("File with name - [" + name + "] was not found");
+        return -1;
     }
 
-    public void delete(String id) {
-        JSONObject obj = new JSONObject();
-        int deleteIndex = 0;
+    public void add(String name, String file) {
+        if(this.findByName(name) == -1){
+            DataConfig payload = new DataConfig(name, file);
+            JSONObject obj = new JSONObject();
 
-        if (this.activeID.equals(id)) {
-            for (int i = 0; i < this.size; i++) {
-                if (data.get(i).getId().equals(id)) {
-                    deleteIndex = i;
-                    break;
-                }
-            }
+            this.data.add(payload);
+
+            obj.put("data", data);
+            obj.put("size", size + 1);
+
+            this.writeJsonFile(obj);
+            LOGGER.info("SUCCEED add log with name - [" + name + "]");
+            this.loadJsonFile();
+        } else{
+            LOGGER.info("FAILED add log because file with name - [" + name + "] is existed");
+        }
+    }
+
+    public void delete(String name) {
+        int deleteIndex = this.findByName(name);
+
+        if(deleteIndex != -1) {
+            JSONObject obj = new JSONObject();
             data.remove(deleteIndex);
 
-            obj.put("active", this.activeID);
             obj.put("data", data);
             obj.put("size", size - 1);
 
             this.writeJsonFile(obj);
-            LOGGER.info("SUCCEED DELETE LOG FILE with ID - [" + id + "]");
             this.loadJsonFile();
-        } else{
-            LOGGER.info("ID - [" + id +"] not found");
+            LOGGER.info("SUCCEED DELETE LOG FILE with name - [" + name + "]");
         }
     }
 
-    public void changeActive(String id) {
-        JSONObject obj = new JSONObject();
-        if(id.equals(this.activeID)){
-            LOGGER.info("ID - [" + id +"] currently selected");
-        } else{
-            String prevActive = this.activeID;
-            for (int i = 0; i < size; i++) {
-                if (data.get(i).getId().equals(id)) {
-                    LOGGER.info("SUCCEED change active ID - [" + id + "]");
-                    this.activeID = id;
-                    obj.put("active", this.activeID);
-                    obj.put("data", data);
-                    obj.put("size", size);
-                    this.writeJsonFile(obj);
-                    loadJsonFile();
-                    break;
-
-                }
-            }
-            if(prevActive.equals(this.activeID)){
-                LOGGER.info("ID - [" + id +"] not found");
-            }
-        }
-
-
-    }
-
-    public void selectFile(String id){
-        for (int i = 0; i < size; i++) {
-            if (data.get(i).getId().equals(id)) {
-                String file = data.get(i).getFile();
-                this.activeFile = file;
-                LOGGER.info("SUCCEED Selected File " + file);
-                break;
-            }
+    public void selectFile(String name) {
+        int index = this.findByName(name);
+        if(index != -1){
+            this.selectedConfig = data.get(index);
+            LOGGER.info("SUCCEED select log with name - [" + name + "]");
         }
     }
 
@@ -124,37 +95,34 @@ public class Config {
             byte[] bytes = string.getBytes();
             fis.write(bytes);
             fis.close();
+            LOGGER.info("SUCCEED write config.json");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public void loadJsonFile() {
-        File file = new File(this.configFile);
-        String jsonString = "";
         try {
+            LOGGER.info("Loading config file...");
+            File file = new File(this.configFile);
+            String jsonString = "";
             jsonString = new String(Files.readAllBytes(Paths.get(file.toURI())));
+
+            JSONObject obj = new JSONObject(jsonString);
+            JSONArray objArr = obj.getJSONArray("data");
+
+            this.size = obj.getInt("size");
+
+            for (int i = 0; i < this.size; i++) {
+                DataConfig dataConfig = new DataConfig(
+                        objArr.getJSONObject(i).get("name").toString(),
+                        objArr.getJSONObject(i).get("file").toString());
+                data.add(dataConfig);
+            }
+            LOGGER.info("SUCCEED load file, total file: " + this.size);
         } catch (IOException e) {
+            LOGGER.info("FAILED load file");
             throw new RuntimeException(e);
         }
-
-        JSONObject obj = new JSONObject(jsonString);
-        JSONArray objArr = obj.getJSONArray("data");
-
-        this.activeID = obj.get("active").toString();
-        this.size = obj.getInt("size");
-
-        for (int i = 0; i < this.size; i++) {
-            DataConfig dataConfig = new DataConfig(
-                    objArr.getJSONObject(i).get("id").toString(),
-                    objArr.getJSONObject(i).get("name").toString(),
-                    objArr.getJSONObject(i).get("file").toString());
-            data.add(dataConfig);
-        }
-
-
-        LOGGER.info("Active ID - [" + this.activeID + "]");
-        this.selectFile(this.activeID);
-        LOGGER.info("Total log file: " + this.size);
     }
 }
